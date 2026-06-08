@@ -1,0 +1,143 @@
+// people that reserve rooms
+Table hosts {
+  id int [primary key]
+  name varchar [not null]
+  email varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+enum worker_role {
+  CLEANER
+  RECEPTIONIST
+  ADMIN
+}
+
+// people that maintain rooms
+Table workers {
+  id int [primary key]
+  name varchar [not null]
+  role worker_role
+  created_at timestamp
+  updated_at timestamp
+}
+
+// to group related rooms together
+Table hotels {
+  id int [primary key]
+  address varchar [not null]
+}
+
+// an individual room with attributes and base price
+Table hotel_rooms {
+  id int [primary key]
+  description varchar [not null] // balcony, tv, ac, etc...
+  size int [not null]
+  hotel int [not null, ref: > hotels.id]
+  base_price_per_night int
+}
+
+// the individual reservations
+// sum of final_price per host can serve as loyalty score
+Table reservations {
+  id int [primary key]
+  //hotel_room int [not null, ref: > hotel_rooms.id]
+  host int [not null, ref: > hosts.id]
+  created_at datetime
+  valid_from datetime
+  valid_to datetime
+  check_in datetime
+  check_out datetime
+  // the final price after discounts
+  final_price int
+  // web, booking, etc...
+  source varchar
+}
+
+Table reservations_rooms {
+  hotel_room int [not null, ref: > hotel_rooms.id]
+  reservations int [not null, ref: > reservations.id]
+}
+
+enum event_type {
+  OUT_OF_ORDER
+  MAINTENANCE
+}
+
+// this table indicates if the room is unavailable to book
+Table hotel_rooms_events {
+  id int [primary key]
+  event_type event_type
+  valid_from datetime
+  valid_to datetime
+  description varchar
+  created_by int [not null, ref: > workers.id]
+  room int [not null, ref: > hotel_rooms.id]
+}
+
+enum access_type {
+  HOST
+  WORKER
+}
+
+// to manage physical access to the rooms
+Table hotel_rooms_access {
+  id int [primary key]
+  access_type access_type
+  room int [not null, ref: > hotel_rooms.id]
+  // the relationship is either with host or worker
+  host int [ref: > hosts.id]
+  worker int [ref: > workers.id]
+  // if worker -> valid_until = end of contract
+  // if host -> valid_until = end of reservation
+  valid_until datetime 
+}
+
+// to manage which worker can perform which actions
+Table permissions {
+  id int [primary key]
+  worker int [not null, ref: > workers.id]
+  granted_by int [not null, ref: > workers.id]
+  entity varchar // hotels, rooms, reservations, discounts
+  action varchar // read, write, update, delete
+  scope varchar // all (*) or specific ids
+  valid_from datetime
+  valid_until datetime
+}
+
+enum discount_type {
+  HOTEL
+  ROOM
+  HOST
+}
+
+// discount for a specific hotel = all rooms within that hotel have a discount
+// discount for a specific room
+// discount for a specific host = all reservations from that host have a discount
+Table discounts {
+  id int [primary key]
+  hotel int [ref: > hotels.id]
+  room int [ref: > hotel_rooms.id]
+  host int [ref: > hosts.id]
+  discount_type discount_type
+  discount_absolute int
+  discount_relative int
+  valid_from datetime
+  valid_to datetime
+}
+
+Table payments {
+  id int [primary key]
+  host int [ref: > hosts.id]
+  reservation int [ref: > reservations.id]
+}
+
+// list of contacts residing individual rooms after check-in
+Table contacts {
+  id int [primary key]
+  reservation int [ref: > reservations.id]
+  room int [ref: > hotel_rooms.id]
+  firstname varchar
+  lastname varbinary
+  // ... etc
+}
