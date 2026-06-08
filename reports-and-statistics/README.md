@@ -1,11 +1,11 @@
 # Reports and statistics
-
 Author: Nikola Davidova
 
 ## Návrhový vzor: Template Method
 
 ## Pseudokód
 
+```
 abstract class ZakladReport {
     datumOd: datum
     datumDo: datum
@@ -38,3 +38,4 @@ class MesicniTrzby extends ZakladReport {
     ZpracujAVratVysledek(data):
         // vrátí celkové tržby za období
 }
+```
