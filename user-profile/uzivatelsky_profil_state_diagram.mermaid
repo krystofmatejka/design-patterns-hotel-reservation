@@ -1,0 +1,59 @@
+classDiagram
+    class LoyaltyAccount {
+        -LoyaltyState state
+        -number points
+        +getPoints() number
+        +setState(state LoyaltyState)
+        +addPoints(amount number)
+        +applyDiscount(price number) number
+        +availableBenefits() Benefit[]
+    }
+
+    class LoyaltyState {
+        <<interface>>
+        +discountRate() number
+        +pointsMultiplier() number
+        +benefits() Benefit[]
+        +name() string
+        +checkUpgrade(account LoyaltyAccount)
+    }
+
+    class StandardState {
+        +discountRate() number
+        +pointsMultiplier() number
+        +benefits() Benefit[]
+        +checkUpgrade(account)
+    }
+    class SilverState {
+        +discountRate() number
+        +pointsMultiplier() number
+        +benefits() Benefit[]
+        +checkUpgrade(account)
+    }
+    class GoldState {
+        +discountRate() number
+        +pointsMultiplier() number
+        +benefits() Benefit[]
+        +checkUpgrade(account)
+    }
+    class PlatinumState {
+        +discountRate() number
+        +pointsMultiplier() number
+        +benefits() Benefit[]
+        +checkUpgrade(account)
+    }
+
+    class Benefit {
+        <<enumeration>>
+        LateCheckout
+        FreeBreakfast
+        RoomUpgrade
+        LoungeAccess
+    }
+
+    LoyaltyAccount o--> LoyaltyState : state
+    LoyaltyState <|.. StandardState
+    LoyaltyState <|.. SilverState
+    LoyaltyState <|.. GoldState
+    LoyaltyState <|.. PlatinumState
+    LoyaltyState ..> Benefit : poskytuje
