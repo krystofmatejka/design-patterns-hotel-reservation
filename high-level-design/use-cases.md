@@ -101,6 +101,7 @@
 
 - Management can view profits from a specific hotel
 - Management can see rooms utilization
+- Management can see statistics about hosts (most frequent guests, ratings)
 
 ### Manage Employees
 
