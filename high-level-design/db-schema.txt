@@ -98,7 +98,7 @@ Table permissions {
   id int [primary key]
   worker int [not null, ref: > workers.id]
   granted_by int [not null, ref: > workers.id]
-  entity varchar // hotels, rooms, reservations, discounts
+  entity varchar // hotels, rooms, reservations, discounts, reports
   action varchar // read, write, update, delete
   scope varchar // all (*) or specific ids
   valid_from datetime
