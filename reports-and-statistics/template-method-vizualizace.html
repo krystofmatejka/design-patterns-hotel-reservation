@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template Method — Reporty a statistiky</title>
+<style>
+  :root {
+    --ink: #15211c;
+    --paper: #eff2ef;
+    --card: #ffffff;
+    --brass: #a8842c;
+    --brass-soft: #f3ead3;
+    --mint: #dce9e2;
+    --green: #1e3d34;
+    --code-bg: #15211c;
+    --code-text: #d9e4de;
+    --muted: #5d6b64;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.55;
+    padding: 32px 16px 64px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  header { margin-bottom: 36px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--brass); font-weight: 700; margin-bottom: 8px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 700; line-height: 1.15;
+  }
+  .sub { color: var(--muted); margin-top: 10px; max-width: 620px; }
+
+  h2 {
+    font-family: Georgia, serif;
+    font-size: 20px; margin: 0 0 4px;
+  }
+  .section-note { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  section { margin-bottom: 44px; }
+
+  /* ---- přepínač bez vzoru / se vzorem ---- */
+  .toggle {
+    display: inline-flex; border: 2px solid var(--ink); border-radius: 999px;
+    overflow: hidden; margin-bottom: 18px; background: var(--card);
+  }
+  .toggle button {
+    border: 0; background: transparent; padding: 9px 20px;
+    font: inherit; font-weight: 600; cursor: pointer; color: var(--ink);
+  }
+  .toggle button.on { background: var(--ink); color: #fff; }
+  .toggle button:focus-visible { outline: 3px solid var(--brass); outline-offset: -3px; }
+
+  .compare { display: none; }
+  .compare.show { display: block; }
+
+  .files { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 640px) { .files { grid-template-columns: 1fr; } }
+  .file {
+    background: var(--card); border: 1px solid #cfd8d2; border-radius: 10px;
+    padding: 14px; font-size: 13px;
+  }
+  .file .fname {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-weight: 700; margin-bottom: 8px; font-size: 12px;
+  }
+  .line { padding: 2px 6px; border-radius: 4px; margin-bottom: 3px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; }
+  .dup { background: #f6d9d2; }      /* duplicitní kód */
+  .uniq { background: var(--mint); } /* unikátní kód */
+
+  .legend { display: flex; gap: 18px; margin-top: 12px; font-size: 13px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+  .verdict {
+    margin-top: 14px; padding: 12px 16px; border-left: 4px solid var(--brass);
+    background: var(--brass-soft); border-radius: 0 8px 8px 0; font-size: 14px;
+  }
+
+  /* ---- interaktivní karta ---- */
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tabs button {
+    border: 2px solid var(--ink); background: var(--card); color: var(--ink);
+    border-radius: 8px; padding: 9px 14px; font: inherit; font-weight: 600;
+    cursor: pointer; font-size: 14px;
+  }
+  .tabs button.on { background: var(--green); border-color: var(--green); color: #fff; }
+  .tabs button:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+
+  .recipe {
+    background: var(--card); border: 1px solid #cfd8d2; border-radius: 14px;
+    padding: 22px; box-shadow: 0 2px 10px rgba(21,33,28,.06);
+  }
+  .recipe-title {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 14px; font-weight: 700; margin-bottom: 4px;
+  }
+  .recipe-sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+
+  .step {
+    display: grid; grid-template-columns: 34px 1fr; gap: 12px;
+    padding: 14px; border-radius: 10px; margin-bottom: 10px;
+    border: 1px solid transparent;
+  }
+  .step.shared { background: var(--mint); }
+  .step.varies { background: var(--brass-soft); border: 1px dashed var(--brass); }
+  .num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--ink); color: #fff; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .step.varies .num { background: var(--brass); }
+  .step .method {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-weight: 700; font-size: 13.5px;
+  }
+  .step .tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    letter-spacing: .5px; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle;
+  }
+  .tag.base { background: var(--green); color: #fff; }
+  .tag.sub  { background: var(--brass); color: #fff; }
+  .step .desc { font-size: 13.5px; color: var(--ink); margin-top: 4px; }
+  .step .sql {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11.5px; background: var(--code-bg); color: var(--code-text);
+    padding: 8px 10px; border-radius: 6px; margin-top: 8px;
+    overflow-x: auto; white-space: pre;
+  }
+
+  .punchline {
+    margin-top: 18px; text-align: center; font-family: Georgia, serif;
+    font-size: 16px; color: var(--green);
+  }
+  .punchline strong { color: var(--brass); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .step.varies .desc, .step.varies .sql, .step.varies .method { animation: swap .25s ease; }
+    @keyframes swap { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  }
+
+  footer { color: var(--muted); font-size: 12px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Hotelový informační systém · Reporty a statistiky</div>
+    <h1>Template Method</h1>
+    <p class="sub">Tři reporty, jeden recept. Rodičovská třída <code>ZakladReport</code> určuje
+    pevné pořadí kroků — každý report si doplní jen svoje dva kroky: jaká data načíst
+    a jak je zpracovat.</p>
+  </header>
+
+  <!-- ============ 1) PROBLÉM ============ -->
+  <section>
+    <h2>1. Proč ten vzor potřebujeme</h2>
+    <p class="section-note">Přepni si mezi variantami — porovnání test1.js (bez vzoru) vs test2.js (se vzorem).</p>
+
+    <div class="toggle" role="tablist" aria-label="Porovnání variant">
+      <button id="btnBez" class="on" onclick="ukazVariantu('bez')">Bez vzoru</button>
+      <button id="btnSe" onclick="ukazVariantu('se')">Se vzorem</button>
+    </div>
+
+    <div id="cmpBez" class="compare show">
+      <div class="files">
+        <div class="file">
+          <div class="fname">prehledObsazenosti</div>
+          <div class="line dup">datumOd, datumDo, hotelId</div>
+          <div class="line dup">postup: načti → zpracuj → vrať</div>
+          <div class="line uniq">SQL: obsazenost pokojů</div>
+          <div class="line uniq">spočítej % obsazenosti</div>
+        </div>
+        <div class="file">
+          <div class="fname">prehledHostu</div>
+          <div class="line dup">datumOd, datumDo, hotelId</div>
+          <div class="line dup">postup: načti → zpracuj → vrať</div>
+          <div class="line uniq">SQL: hosté + počet rezervací</div>
+          <div class="line uniq">vrať top hosty a hodnocení</div>
+        </div>
+        <div class="file">
+          <div class="fname">mesicniTrzby</div>
+          <div class="line dup">datumOd, datumDo, hotelId</div>
+          <div class="line dup">postup: načti → zpracuj → vrať</div>
+          <div class="line uniq">SQL: součet final_price</div>
+          <div class="line uniq">vrať tržby za období</div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:#f6d9d2"></span> stejné ve všech třech (duplicita)</span>
+        <span><span class="dot" style="background:var(--mint)"></span> to, co se opravdu liší</span>
+      </div>
+      <div class="verdict">Atributy i postup se opakují <strong>3×</strong>. Když se postup změní (třeba přibude kontrola oprávnění), musí se přepsat na třech místech — a na jedno se zaručeně zapomene.</div>
+    </div>
+
+    <div id="cmpSe" class="compare">
+      <div class="files">
+        <div class="file" style="grid-column: 1 / -1;">
+          <div class="fname">ZakladReport (abstraktní třída)</div>
+          <div class="line" style="background:var(--mint)">datumOd, datumDo, hotelId — napsáno jednou</div>
+          <div class="line" style="background:var(--mint)">vytvorReport(): nactiData() → zpracujAVratVysledek(data)</div>
+          <div class="line" style="background:var(--brass-soft)">nactiData() a zpracujAVratVysledek() → doplní potomek</div>
+        </div>
+        <div class="file"><div class="fname">PrehledObsazenosti</div><div class="line uniq">SQL: obsazenost pokojů</div><div class="line uniq">spočítej % obsazenosti</div></div>
+        <div class="file"><div class="fname">PrehledHostu</div><div class="line uniq">SQL: hosté + rezervace</div><div class="line uniq">vrať top hosty</div></div>
+        <div class="file"><div class="fname">MesicniTrzby</div><div class="line uniq">SQL: součet final_price</div><div class="line uniq">vrať tržby</div></div>
+      </div>
+      <div class="verdict">Atributy a postup jsou napsané <strong>jednou</strong> ve <code>ZakladReport</code>. Každý report obsahuje jen svoje dva kroky. Nový report = jedna malá třída.</div>
+    </div>
+  </section>
+
+  <!-- ============ 2) INTERAKTIVNÍ RECEPT ============ -->
+  <section>
+    <h2>2. Jak to funguje — vyzkoušej si to</h2>
+    <p class="section-note">Klikni na report. Kostra <code>vytvorReport()</code> se nikdy nemění — mění se jen obsah kroků 1 a 2.</p>
+
+    <div class="tabs" role="tablist" aria-label="Výběr reportu">
+      <button id="tab-obsazenost" class="on" onclick="vyberReport('obsazenost')">Přehled obsazenosti</button>
+      <button id="tab-hoste" onclick="vyberReport('hoste')">Přehled hostů</button>
+      <button id="tab-trzby" onclick="vyberReport('trzby')">Měsíční tržby</button>
+    </div>
+
+    <div class="recipe">
+      <div class="recipe-title" id="recipeName">new PrehledObsazenosti(datumOd, datumDo, hotelId).vytvorReport()</div>
+      <div class="recipe-sub">Recept je vždycky stejný — vyměňují se jen ingredience.</div>
+
+      <div class="step shared">
+        <div class="num">▶</div>
+        <div>
+          <span class="method">vytvorReport()</span><span class="tag base">ZakladReport</span>
+          <div class="desc">Pevná kostra (template method): zavolá <code>nactiData()</code> a výsledek pošle do
+          <code>zpracujAVratVysledek(data)</code>. Pořadí kroků určuje rodič — potomci ho nemůžou rozbít.</div>
+        </div>
+      </div>
+
+      <div class="step varies">
+        <div class="num">1</div>
+        <div>
+          <span class="method">nactiData()</span><span class="tag sub" id="subTag1">PrehledObsazenosti</span>
+          <div class="desc" id="varDesc1">Načte pokoje a rezervace pro daný hotel a období.</div>
+          <div class="sql" id="varSql1">SELECT hotel_rooms.*, reservations.*
+FROM hotel_rooms
+LEFT JOIN reservations_rooms ON hotel_rooms.id = reservations_rooms.hotel_room
+LEFT JOIN reservations ON reservations.id = reservations_rooms.reservations
+WHERE hotel_rooms.hotel = hotelId
+AND reservations.valid_from BETWEEN datumOd AND datumDo</div>
+        </div>
+      </div>
+
+      <div class="step varies">
+        <div class="num">2</div>
+        <div>
+          <span class="method">zpracujAVratVysledek(data)</span><span class="tag sub" id="subTag2">PrehledObsazenosti</span>
+          <div class="desc" id="varDesc2">Spočítá, kolik pokojů bylo obsazených, a vrátí % obsazenosti.</div>
+        </div>
+      </div>
+
+      <div class="punchline">Kostra je <strong>jedna</strong> a nemění se. Každý report doplňuje jen <strong>svoje dva kroky</strong> — to je Template Method.</div>
+    </div>
+  </section>
+
+  <footer>Reporty a statistiky · Nikola Davidová · Template Method · vizualizace pro workshop</footer>
+</div>
+
+<script>
+  // --- data pro kroky 1 a 2, podle skutečného pseudokódu ---
+  const reporty = {
+    obsazenost: {
+      trida: "PrehledObsazenosti",
+      desc1: "Načte pokoje a rezervace pro daný hotel a období.",
+      sql: "SELECT hotel_rooms.*, reservations.*\nFROM hotel_rooms\nLEFT JOIN reservations_rooms ON hotel_rooms.id = reservations_rooms.hotel_room\nLEFT JOIN reservations ON reservations.id = reservations_rooms.reservations\nWHERE hotel_rooms.hotel = hotelId\nAND reservations.valid_from BETWEEN datumOd AND datumDo",
+      desc2: "Spočítá, kolik pokojů bylo obsazených, a vrátí % obsazenosti."
+    },
+    hoste: {
+      trida: "PrehledHostu",
+      desc1: "Načte hosty a počet jejich rezervací pro daný hotel a období.",
+      sql: "SELECT hosts.*, COUNT(reservations.id) as pocetRezervaci\nFROM hosts\nJOIN reservations ON hosts.id = reservations.host\nJOIN reservations_rooms ON reservations.id = reservations_rooms.reservations\nJOIN hotel_rooms ON reservations_rooms.hotel_room = hotel_rooms.id\nWHERE hotel_rooms.hotel = hotelId\nAND reservations.valid_from BETWEEN datumOd AND datumDo\nGROUP BY hosts.id\nORDER BY pocetRezervaci DESC",
+      desc2: "Vrátí top hosty a jejich hodnocení."
+    },
+    trzby: {
+      trida: "MesicniTrzby",
+      desc1: "Sečte ceny rezervací (final_price) pro daný hotel a období.",
+      sql: "SELECT SUM(reservations.final_price) as trzby\nFROM reservations\nJOIN payments ON reservations.id = payments.reservation\nJOIN reservations_rooms ON reservations.id = reservations_rooms.reservations\nJOIN hotel_rooms ON reservations_rooms.hotel_room = hotel_rooms.id\nWHERE hotel_rooms.hotel = hotelId\nAND reservations.valid_from BETWEEN datumOd AND datumDo",
+      desc2: "Vrátí celkové tržby za období."
+    }
+  };
+
+  function vyberReport(klic) {
+    const r = reporty[klic];
+    document.getElementById("recipeName").textContent =
+      "new " + r.trida + "(datumOd, datumDo, hotelId).vytvorReport()";
+    document.getElementById("subTag1").textContent = r.trida;
+    document.getElementById("subTag2").textContent = r.trida;
+    document.getElementById("varDesc1").textContent = r.desc1;
+    document.getElementById("varSql1").textContent = r.sql;
+    document.getElementById("varDesc2").textContent = r.desc2;
+
+    // restart animace měnících se kroků
+    document.querySelectorAll(".step.varies").forEach(krok => {
+      krok.style.animation = "none";
+      void krok.offsetWidth;
+      krok.style.animation = "";
+    });
+
+    ["obsazenost", "hoste", "trzby"].forEach(k =>
+      document.getElementById("tab-" + k).classList.toggle("on", k === klic));
+  }
+
+  function ukazVariantu(v) {
+    document.getElementById("cmpBez").classList.toggle("show", v === "bez");
+    document.getElementById("cmpSe").classList.toggle("show", v === "se");
+    document.getElementById("btnBez").classList.toggle("on", v === "bez");
+    document.getElementById("btnSe").classList.toggle("on", v === "se");
+  }
+</script>
+</body>
+</html>

@@ -11,7 +11,7 @@ abstract class ZakladReport {
     datumDo: datum
     hotelId: int  // pro který hotel chceme report
 
-    VytvorReport():
+    VytvorReport():         //key 
         data = NactiData()
         return ZpracujAVratVysledek(data)
 
@@ -64,7 +64,7 @@ class MesicniTrzby extends ZakladReport {
 }
 ```
 
-## JavaScript implementace
+## JavaScript muj test implementace 
 
 ```javascript
 class ZakladReport {
