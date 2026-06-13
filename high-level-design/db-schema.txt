@@ -7,17 +7,17 @@ Table hosts {
   updated_at timestamp
 }
 
-enum worker_role {
+enum employee_role {
   CLEANER
   RECEPTIONIST
-  ADMIN
+  MANAGER
 }
 
 // people that maintain rooms
-Table workers {
+Table employees {
   id int [primary key]
   name varchar [not null]
-  role worker_role
+  role employee_role
   created_at timestamp
   updated_at timestamp
 }
@@ -25,7 +25,13 @@ Table workers {
 // to group related rooms together
 Table hotels {
   id int [primary key]
+  hotel_complex int [ref: > hotel_complexes.id]
   address varchar [not null]
+}
+
+Table hotel_complexes {
+  id int [primary key]
+  name varchar [not null]
 }
 
 // an individual room with attributes and base price
@@ -35,6 +41,16 @@ Table hotel_rooms {
   size int [not null]
   hotel int [not null, ref: > hotels.id]
   base_price_per_night int
+}
+
+Table hotel_room_services {
+  id int [primary key]
+  hotel_room int [not null, ref: > hotel_rooms.id]
+  reservation int [not null, ref: > reservations.id]
+  name varchar [not null]
+  price double [not null]
+  payed_by int [not null, ref: > hosts.id]
+  payed_date datetime
 }
 
 // the individual reservations
@@ -71,7 +87,7 @@ Table hotel_rooms_events {
   valid_from datetime
   valid_to datetime
   description varchar
-  created_by int [not null, ref: > workers.id]
+  created_by int [not null, ref: > employees.id]
   room int [not null, ref: > hotel_rooms.id]
 }
 
@@ -87,7 +103,7 @@ Table hotel_rooms_access {
   room int [not null, ref: > hotel_rooms.id]
   // the relationship is either with host or worker
   host int [ref: > hosts.id]
-  worker int [ref: > workers.id]
+  worker int [ref: > employees.id]
   // if worker -> valid_until = end of contract
   // if host -> valid_until = end of reservation
   valid_until datetime 
@@ -96,11 +112,12 @@ Table hotel_rooms_access {
 // to manage which worker can perform which actions
 Table permissions {
   id int [primary key]
-  worker int [not null, ref: > workers.id]
-  granted_by int [not null, ref: > workers.id]
-  entity varchar // hotels, rooms, reservations, discounts, reports
+  employee int [not null, ref: > employees.id]
+  granted_by int [not null, ref: > employees.id]
+  entity varchar // hotels, rooms, reservations, discounts
   action varchar // read, write, update, delete
   scope varchar // all (*) or specific ids
+  code varchar // manager_full_access, cleaner_bo
   valid_from datetime
   valid_until datetime
 }

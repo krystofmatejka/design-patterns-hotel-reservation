@@ -1,0 +1,11 @@
+- read
+  - elastic for search
+  - redis for cache
+  - 
+- write
+  - kafka for write to DB
+  - kafka for cache update
+  - shard by location
+  - shard by hotel groups
+- capacity
+  - 
