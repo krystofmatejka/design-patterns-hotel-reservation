@@ -72,7 +72,7 @@ class RoomService {
 }
 
 class Room() {
-  int id;
+  int id { get; private set; }
   int number { get; private set; }
   string type { get; private set; }
   int price { get; private set; }

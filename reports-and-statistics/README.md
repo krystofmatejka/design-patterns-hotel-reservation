@@ -21,44 +21,21 @@ abstract class ZakladReport {
 
 class PrehledObsazenosti extends ZakladReport {
     NactiData():
-        // SELECT hotel_rooms.*, reservations.*
-        // FROM hotel_rooms
-        // LEFT JOIN reservations_rooms ON hotel_rooms.id = reservations_rooms.hotel_room
-        // LEFT JOIN reservations ON reservations.id = reservations_rooms.reservations
-        // WHERE hotel_rooms.hotel = hotelId
-        // AND reservations.valid_from BETWEEN datumOd AND datumDo
-
+        // vytáhne pokoje a jejich rezervace za období a hotel
     ZpracujAVratVysledek(data):
-        // spočítá kolik pokojů bylo obsazených
-        // vrátí % obsazenosti
+        // spočítá obsazenost, vrátí v procentech
 }
 
 class PrehledHostu extends ZakladReport {
     NactiData():
-        // SELECT hosts.*, COUNT(reservations.id) as pocetRezervaci
-        // FROM hosts
-        // JOIN reservations ON hosts.id = reservations.host
-        // JOIN reservations_rooms ON reservations.id = reservations_rooms.reservations
-        // JOIN hotel_rooms ON reservations_rooms.hotel_room = hotel_rooms.id
-        // WHERE hotel_rooms.hotel = hotelId
-        // AND reservations.valid_from BETWEEN datumOd AND datumDo
-        // GROUP BY hosts.id
-        // ORDER BY pocetRezervaci DESC
-
+        // vytáhne hosty a počet jejich rezervací za období a hotel
     ZpracujAVratVysledek(data):
-        // vrátí top hosty a jejich hodnocení
+        // seřadí hosty a vrátí ty nejčastější
 }
 
 class MesicniTrzby extends ZakladReport {
     NactiData():
-        // SELECT SUM(reservations.final_price) as trzby
-        // FROM reservations
-        // JOIN payments ON reservations.id = payments.reservation
-        // JOIN reservations_rooms ON reservations.id = reservations_rooms.reservations
-        // JOIN hotel_rooms ON reservations_rooms.hotel_room = hotel_rooms.id
-        // WHERE hotel_rooms.hotel = hotelId
-        // AND reservations.valid_from BETWEEN datumOd AND datumDo
-
+        // sečte platby za rezervace za období a hotel
     ZpracujAVratVysledek(data):
         // vrátí celkové tržby za období
 }

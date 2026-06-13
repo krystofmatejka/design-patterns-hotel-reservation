@@ -19,7 +19,7 @@ class ZakladReport {
     }
 }
 
-// PŘEHLED OBSAZENOSTI
+// PREHLED OBSAZENOSTI
 class PrehledObsazenosti extends ZakladReport {
     nactiData() {
         // SELECT hotel_rooms.*, reservations.*
@@ -34,14 +34,10 @@ class PrehledObsazenosti extends ZakladReport {
     }
 }
 
-// PŘEHLED HOSTŮ
+// PREHLED HOSTŮ
 class PrehledHostu extends ZakladReport {
     nactiData() {
-        // SELECT hosts.*, COUNT(reservations.id) as pocetRezervaci
-        // FROM hosts
-        // WHERE hotel_rooms.hotel = this.hotelId
-        // AND reservations.valid_from BETWEEN this.datumOd AND this.datumDo
-        // ORDER BY pocetRezervaci DESC
+        ///////
     }
 
     zpracujAVratVysledek(data) {
@@ -52,16 +48,10 @@ class PrehledHostu extends ZakladReport {
 // MĚSÍČNÍ TRŽBY
 class MesicniTrzby extends ZakladReport {
     nactiData() {
-        // SELECT SUM(reservations.final_price) as trzby
-        // FROM reservations
-        // WHERE hotel_rooms.hotel = this.hotelId
-        // AND reservations.valid_from BETWEEN this.datumOd AND this.datumDo
+        //
     }
 
     zpracujAVratVysledek(data) {
         // vrátí celkové tržby za období
     }
 }
-
-const report = new MesicniTrzby("2025-01-01", "2025-01-31", 1)
-report.vytvorReport()
