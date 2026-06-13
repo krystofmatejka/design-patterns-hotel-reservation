@@ -6,11 +6,7 @@ class PrehledObsazenosti {
     }
 
     vytvorReport() {
-        // SELECT hotel_rooms.*, reservations.*
-        // FROM hotel_rooms
-        // WHERE hotel_rooms.hotel = this.hotelId
-        // AND reservations.valid_from BETWEEN this.datumOd AND this.datumDo
-        // spočítá % obsazenosti
+        // .............
     }
 }
 
@@ -22,7 +18,6 @@ class PrehledHostu {
     }
 
     vytvorReport() {
-        // SELECT hosts.*...
         // vrátí top hosty
     }
 }
@@ -35,7 +30,7 @@ class MesicniTrzby {
     }
 
     vytvorReport() {
-        // SELECT SUM...
         // vrátí tržby
     }
 }
+
