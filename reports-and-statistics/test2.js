@@ -19,7 +19,7 @@ class ZakladReport {
     }
 }
 
-// PŘEHLED OBSAZENOSTI
+// PREHLED OBSAZENOSTI
 class PrehledObsazenosti extends ZakladReport {
     nactiData() {
         // SELECT hotel_rooms.*, reservations.*
@@ -34,7 +34,7 @@ class PrehledObsazenosti extends ZakladReport {
     }
 }
 
-// PŘEHLED HOSTŮ
+// PREHLED HOSTŮ
 class PrehledHostu extends ZakladReport {
     nactiData() {
         ///////
@@ -55,6 +55,3 @@ class MesicniTrzby extends ZakladReport {
         // vrátí celkové tržby za období
     }
 }
-
-const report = new MesicniTrzby("2025-01-01", "2025-01-31", 1)
-report.vytvorReport()

@@ -6,19 +6,19 @@ class PrehledObsazenosti {
     }
 
     vytvorReport() {
-        // .............
+        // vrati obsazenost v procentech 
     }
 }
 
 class PrehledHostu {
     constructor(datumOd, datumDo, hotelId) {
         this.datumOd = datumOd  
-        this.datumDo = datumDo  // atd....
-        this.hotelId = hotelId  // atd.......
+        this.datumDo = datumDo  
+        this.hotelId = hotelId  //atd ...
     }
 
     vytvorReport() {
-        // vrátí top hosty
+        // vrati top hosty 
     }
 }
 
@@ -30,7 +30,7 @@ class MesicniTrzby {
     }
 
     vytvorReport() {
-        // vrátí tržby
+        // vrati trzby 
     }
 }
 
