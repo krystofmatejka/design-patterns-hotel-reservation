@@ -3,7 +3,7 @@ class ReservationProcess {
     creteReservation(data) {
         this.checkOccupancy(data.roomId, data.date);
         this.saveGuestData(data.guest);
-        this.makePayment(data.amount);
+        this.zaplatitZalohu(data.amount);
         this.sendNotification();
     }
 
@@ -15,7 +15,7 @@ class ReservationProcess {
         /* SQL dotaz */
     }
 
-    makePayment(amount) {
+    zaplatitZalohu(amount) {
         throw new Error("Payment error");
     }
     sendNotification() {
@@ -24,7 +24,7 @@ class ReservationProcess {
 }
 
 class StandardHotelRezervace extends ReservationProcess {
-    makePayment(amount) {
+    zaplatitZalohu(amount) {
         console.log(`Zpracování platební karty v hodnotě ${amount} CZK.`);
     }
 
